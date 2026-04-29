@@ -28,7 +28,7 @@ function colorClass(value, warnThreshold, dangerThreshold) {
 
 async function refresh() {
     try {
-        const res = await fetch("/api/metrics");
+        const res = await fetch("/monitor/api/metrics");
         const d = await res.json();
 
         // Global request rate

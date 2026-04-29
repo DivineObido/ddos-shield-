@@ -43,11 +43,13 @@ class Dashboard:
         app = self._app
 
         @app.route("/")
+        @app.route("/monitor")
         def index():
             # Flask looks for index.html inside the templates/ folder automatically.
             return render_template("index.html")
 
         @app.route("/api/metrics")
+        @app.route("/monitor/api/metrics")
         def metrics():
             snapshot = self.baseline.get_snapshot()
             banned_ips = self.blocker.get_banned_ips()
