@@ -81,6 +81,11 @@ class AnomalyDetector:
         
     # This is the main method that gets called for every new request.
     def process(self, entry: LogEntry):
+        WHITELISTED = {"127.0.0.1", "100.55.26.39"}
+        if entry.source_ip in WHITELISTED:
+            self.baseline.record(is_error=entry.is_error())
+            return
+    
         now = time.time()
         ip = entry.source_ip
         is_error = entry.is_error()
