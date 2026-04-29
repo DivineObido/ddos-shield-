@@ -55,7 +55,7 @@ class AnomalyDetector:
         self.window_seconds = window_seconds
         self.on_ip_anomaly = on_ip_anomaly
         self.on_global_anomaly = on_global_anomaly
-
+    
         self._lock = threading.Lock()
 
         # One sliding window per IP address.

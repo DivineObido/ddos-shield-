@@ -139,6 +139,7 @@ class LogMonitor:
 
             if line:
                 # A new request came in — parse it and pass it on
+                logger.info("Read new log line from nginx")
                 entry = parse_line(line)
                 if entry:
                     try:
