@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDoS Shield — Live Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: #0a0a0f;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1e3a5f;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            color: #4fc3f7;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        #uptime { font-size: 0.85rem; color: #607d8b; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: #0d1117;
+            border: 1px solid #1e3a5f;
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .card .label {
+            font-size: 0.7rem;
+            color: #607d8b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .card .value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+
+        .card .value.danger { color: #ef5350; }
+        .card .value.warn   { color: #ffa726; }
+        .card .value.ok     { color: #66bb6a; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 8px 12px;
+            color: #607d8b;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #1e3a5f;
+        }
+
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #0d1117;
+        }
+
+        tr:hover td { background: #0d1117; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .badge.banned { background: #b71c1c; color: #fff; }
+        .badge.perm   { background: #4a148c; color: #fff; }
+        .badge.active { background: #1b5e20; color: #fff; }
+
+        .section-title {
+            font-size: 0.75rem;
+            color: #607d8b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .panel {
+            background: #0d1117;
+            border: 1px solid #1e3a5f;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        #status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #66bb6a;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%   { opacity: 1; }
+            50%  { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .last-updated {
+            font-size: 0.72rem;
+            color: #37474f;
+            text-align: right;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1><span id="status-dot"></span>DDoS Shield</h1>
+    <div id="uptime">Uptime: loading...</div>
+</header>
+
+<div class="grid">
+    <div class="card">
+        <div class="label">Global Req/s</div>
+        <div class="value" id="global-rate">—</div>
+    </div>
+    <div class="card">
+        <div class="label">Baseline Mean</div>
+        <div class="value" id="baseline-mean">—</div>
+    </div>
+    <div class="card">
+        <div class="label">Baseline Stddev</div>
+        <div class="value" id="baseline-std">—</div>
+    </div>
+    <div class="card">
+        <div class="label">Banned IPs</div>
+        <div class="value" id="banned-count">—</div>
+    </div>
+    <div class="card">
+        <div class="label">CPU Usage</div>
+        <div class="value" id="cpu">—</div>
+    </div>
+    <div class="card">
+        <div class="label">Memory Usage</div>
+        <div class="value" id="memory">—</div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="section-title">Banned IPs</div>
+    <table>
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>Offenses</th>
+                <th>Status</th>
+                <th>Expires</th>
+                <th>Reason</th>
+            </tr>
+        </thead>
+        <tbody id="banned-table">
+            <tr><td colspan="5" style="color:#37474f">No active bans.</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="panel">
+    <div class="section-title">Top 10 Source IPs</div>
+    <table>
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>Total Requests</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody id="top-ips-table">
+            <tr><td colspan="3" style="color:#37474f">No traffic yet.</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="last-updated">
+    Last updated: <span id="last-updated">—</span>
+</div>
+
+<!-- Load the dashboard logic from the static folder -->
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+
+</body>
+</html>

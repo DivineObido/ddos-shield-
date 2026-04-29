@@ -1,0 +1,7 @@
+nginx/
+detector/config.yaml
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
